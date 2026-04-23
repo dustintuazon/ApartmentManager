@@ -1,0 +1,41 @@
+﻿@using ApartmentManager.ViewModels.Account
+@model LoginViewModel
+
+@{
+	ViewData["Title"] = "Login";
+	Layout = "~/Views/Shared/_ClearLayout.cshtml";
+}
+
+<div class="center-container">
+	<div class="inner-container">
+		<h2 class="text-center">Login</h2>
+		<form asp-action="Login" method="post" autocomplete="off">
+			@Html.AntiForgeryToken()
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<div class="mb-3">
+				<label asp-for="Username" class="form-label"></label>
+				<input asp-for="Username" class="form-control"/>
+				<span asp-validation-for="Username" class="text-danger"></span>
+			</div>
+			<div class="mb-3">
+				<label asp-for="Password" class="form-label"></label>
+				<input asp-for="Password" class="form-control" />
+				<span asp-validation-for="Password" class="text-danger"></span>
+			</div>
+			<div class="form-check mb-3">
+				<label class="form-check-label">
+					<input asp-for="RememberMe" class="form-check-input" />
+					@Html.DisplayNameFor(r=> r.RememberMe)
+				</label>
+			</div>
+
+			<button type="submit" class="btn btn-success w-100">Login</button>
+		</form>
+	</div>
+</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial.cshtml");
+	}
+}
