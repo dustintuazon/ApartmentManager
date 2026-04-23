@@ -1,0 +1,29 @@
+﻿@using ApartmentManager.ViewModels.Account
+@model IEnumerable<ViewAccountViewModel>
+
+@{
+	ViewData["Title"] = "Accounts";
+}
+<h2>Accounts</h2>
+
+<table>
+	<thead>
+		<tr>
+			<th>Username</th>
+			<th>Email</th>
+			<th>Roles</th>
+			<th>No. of rooms</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach(var item in Model)
+		{
+			<tr>
+				<td>@item.Username</td>
+				<td>@item.Email</td>
+				<td>@item.Roles</td>
+				<td>@item.NumberOfRooms</td>
+			</tr>
+		}
+	</tbody>
+</table>
