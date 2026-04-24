@@ -1,29 +1,36 @@
 ﻿@using ApartmentManager.ViewModels.Account
-@model IEnumerable<ViewAccountViewModel>
+@model IEnumerable<ViewUserViewModel>
 
 @{
-	ViewData["Title"] = "Accounts";
+	ViewData["Title"] = "Users";
 }
 <h2>Accounts</h2>
-
-<table>
-	<thead>
-		<tr>
-			<th>Username</th>
-			<th>Email</th>
-			<th>Roles</th>
-			<th>No. of rooms</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach(var item in Model)
-		{
+<a class="btn btn-success my-3" asp-action="CreateEditUser" asp-controller="Account">Create account</a>
+<div class="table-responsive">
+	<table class="table">
+		<thead>
 			<tr>
-				<td>@item.Username</td>
-				<td>@item.Email</td>
-				<td>@item.Roles</td>
-				<td>@item.NumberOfRooms</td>
+				<th>Username</th>
+				<th>Email</th>
+				<th>Roles</th>
+				<th>No. of rooms</th>
+				<th>Action</th>
 			</tr>
-		}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+			@foreach(var item in Model)
+			{
+				<tr>
+					<td>@item.Username</td>
+					<td>@item.Email</td>
+					<td>@item.Roles</td>
+					<td>@item.NumberOfRooms</td>
+					<td>
+						<a asp-controller="Account" asp-action="CreateEditUser" asp-route-id="@item.Id" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i></a>
+						<button class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
