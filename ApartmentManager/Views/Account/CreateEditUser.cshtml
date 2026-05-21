@@ -12,6 +12,8 @@
 	}
 }
 
+<h1>@(Model.IsEditing ? "Edit Account" : "Create Account")</h1>
+
 <div>
 	<form asp-action="CreateEditUser" method="post" autocomplete="off">
 		@Html.AntiForgeryToken()
