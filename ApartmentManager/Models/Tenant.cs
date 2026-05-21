@@ -11,6 +11,7 @@ namespace ApartmentManager.Models
         public Status Status { get; set; }
         public int MonthsPaid { get; set; } = 1;
         public int Balance { get; set; }
+        public int Deposit { get; set; }
         public int? RoomId { get; set; }
         public Room? Room { get; set; }
         public ICollection<Transaction>? Transactions { get; set; }
