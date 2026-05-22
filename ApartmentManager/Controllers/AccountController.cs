@@ -24,7 +24,7 @@ namespace ApartmentManager.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            var accounts = await userManager.Users.Include(r=>r.Rooms).ToListAsync();
+            var accounts = await userManager.Users.Include(r=>r.Rooms).OrderBy(u => u.UserName).ToListAsync();
             
             List<ViewUserViewModel> accountsViewModel = new List<ViewUserViewModel>();
 
