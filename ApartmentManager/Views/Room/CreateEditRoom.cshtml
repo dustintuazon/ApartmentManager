@@ -1,0 +1,44 @@
+﻿@using ApartmentManager.ViewModels.Room
+@model CreateEditRoomViewModel
+@{
+	ViewData["Title"] = (Model.Id.HasValue ? "Edit Room" : "Create Room");
+}
+
+<h1>@(Model.Id.HasValue ? "Edit Room" : "Create Room")</h1>
+
+<form asp-action="CreateEditRoom" method="post" autocomplete="off" asp-route-id="@Model.Id">
+	@Html.AntiForgeryToken()
+	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+	<div class="mb-3">
+		<label asp-for="Name" class="form-label"></label>
+		<input asp-for="Name" class="form-control" />
+		<span asp-validation-for="Name" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="Description" class="form-label"></label>
+		<input asp-for="Description" class="form-control"></input>
+		<span asp-validation-for="Description" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="Monthly" class="form-label"></label>
+		<input asp-for="Monthly" class="form-control" />
+		<span asp-validation-for="Monthly" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="MonthsAdvanced" class="form-label"></label>
+		<input asp-for="MonthsAdvanced" class="form-control" />
+		<span asp-validation-for="MonthsAdvanced" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="MonthsDeposit" class="form-label"></label>
+		<input asp-for="MonthsDeposit" class="form-control" />
+		<span asp-validation-for="MonthsDeposit" class="text-danger"></span>
+	</div>
+	<button class="btn btn-success" type="submit">@(Model.Id.HasValue ? "Update" : "Create")</button>
+</form>
+
+@section Scripts{
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial.cshtml");
+	}
+}

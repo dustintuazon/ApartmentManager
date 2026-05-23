@@ -54,7 +54,7 @@ namespace ApartmentManager.Services
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
 
             }

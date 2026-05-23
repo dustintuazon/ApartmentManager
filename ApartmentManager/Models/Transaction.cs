@@ -18,6 +18,7 @@
     {
         Monthly = 0,
         Balance = 1,
+        Deposit = 2
     }
 
     public enum ModeOfPayment

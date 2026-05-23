@@ -1,0 +1,37 @@
+﻿@using ApartmentManager.ViewModels.Room
+@model IEnumerable<ViewRoomViewModel>
+@{
+	ViewData["Title"] = "Rooms"; 
+}
+<h1>Rooms</h1>
+
+<a class="btn btn-primary my-3" asp-action="CreateEditRoom" asp-controller="Room">Create Room</a>
+
+<div class="container-md">
+	<div class="row">
+		@foreach (var room in Model)
+		{
+			<div class="col-lg-3">
+				<div class="card mb-3 border-2 @(room.IsAvailable ? "border-success" : "border-danger")">
+					<div class="card-body">
+						<div class="d-flex justify-content-between">
+							<h4 class="card-title">@room.Name</h4>
+							@if(room.IsAvailable)
+							{
+								<div>
+									<a class="btn btn-primary btn-sm align-self-center" asp-controller="Room" asp-action="CreateEditRoom" asp-route-id="@room.Id">Add Tenant</a>
+									<a class="btn btn-primary btn-sm align-self-center" asp-controller="Room" asp-action="CreateEditRoom" asp-route-id="@room.Id"><i class="bi bi-pencil"></i></a>
+								</div>
+							}
+						</div>
+						<p class="card-text my-1">@room.Description</p>
+						<p class="card-text my-1">Monthly: PHP @room.Monthly</p>
+						<p class="card-text my-1">@room.MonthsDeposit Month(s) Deposit</p>
+						<p class="card-text my-1">@room.MonthsAdvance Month(s) Advance</p>
+						<p class="card-text my-1 border d-inline-block px-2 py-1 @(room.IsAvailable ? "border-success text-success" : "border-danger text-danger") rounded">@(room.IsAvailable ? "Available" : "Occupied")</p>
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+</div>
