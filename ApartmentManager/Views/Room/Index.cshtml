@@ -12,9 +12,18 @@
 		@foreach (var room in Model)
 		{
 			<div class="col-lg-3">
-				<div class="card mb-3">
+				<div class="card mb-3 border-2 @(room.IsAvailable ? "border-success" : "border-danger")">
 					<div class="card-body">
-						<h4 class="card-title">@room.Name</h4>
+						<div class="d-flex justify-content-between">
+							<h4 class="card-title">@room.Name</h4>
+							@if(room.IsAvailable)
+							{
+								<div>
+									<a class="btn btn-primary btn-sm align-self-center" asp-controller="Room" asp-action="CreateEditRoom" asp-route-id="@room.Id">Add Tenant</a>
+									<a class="btn btn-primary btn-sm align-self-center" asp-controller="Room" asp-action="CreateEditRoom" asp-route-id="@room.Id"><i class="bi bi-pencil"></i></a>
+								</div>
+							}
+						</div>
 						<p class="card-text my-1">@room.Description</p>
 						<p class="card-text my-1">Monthly: PHP @room.Monthly</p>
 						<p class="card-text my-1">@room.MonthsDeposit Month(s) Deposit</p>

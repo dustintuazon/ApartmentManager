@@ -42,6 +42,8 @@ namespace ApartmentManager.Controllers
             if (id != null)
             {
                 var room = await _context.Rooms.FindAsync(id);
+                if (room == null) return NotFound();
+                if (!room.IsAvailable) return RedirectToAction("Index", "Room");
                 var viewModel = new CreateEditRoomViewModel
                 {
                     Id = room.Id,
@@ -76,6 +78,11 @@ namespace ApartmentManager.Controllers
                 if (room == null)
                 {
                     return NotFound();
+                }
+                if (!room.IsAvailable)
+                {
+                    ModelState.AddModelError(string.Empty, "Cannot edit a room that is currently rented.");
+                    return View(model);
                 }
                 room.Name = model.Name;
                 room.Description = model.Description;
