@@ -1,9 +1,71 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using ApartmentManager.ViewModels.Dashboard
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="mb-3 d-flex justify-content-between">
+	<h1>Dashboard</h1>
+    <a class="btn btn-primary align-self-center">Add Tenant</a>
+</div>
 
+<div class="container-md">
+    <div class="row gy-3">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body border-3 border-top border-success text-center">
+                    <h4 class="card-title">This Year's Income - @DateTime.Now.Year</h4>
+                    <p class="card-text display-5">@Model.YearIncome.ToString("C")</p>
+                </div>  
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body border-3 border-top border-success text-center">
+                    <h4 class="card-title">This Month's Income - @DateTime.Now.ToString("MMMM")</h4>
+                    <p class="card-text display-5">@Model.MonthIncome.ToString("C")</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Rooms</h4>
+                    <p class="card-text display-5">@Model.RoomCount</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Tenants</h4>
+                    <p class="card-text display-5">@Model.TenantCount</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Available Rooms</h4>
+                    <p class="card-text display-5">@Model.AvailableRooms</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Paid Tenants</h4>
+                    <p class="card-text display-5">3</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Unpaid Tenants</h4>
+                    <p class="card-text display-5">3</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
