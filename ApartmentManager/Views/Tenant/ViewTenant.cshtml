@@ -1,0 +1,43 @@
+﻿@using ApartmentManager.ViewModels.Tenant
+@model ViewTenantViewModel
+@{
+	ViewData["Title"] = "Tenant Details"; 
+}
+
+<div class="container">
+	<h3>Tenant: @Model.TenantName</h3>
+	<h4>Room: @Model.RoomName</h4>
+	<div class="mb-3">
+		<p>Description: @Model.Description</p>
+		<p>Move-in Date: @Model.MoveInDate.ToShortDateString()</p>
+		<p>Balance: @Model.Balance</p>
+		<p>Deposit: @Model.Deposit</p>
+	</div>
+</div>
+
+<div class="container">
+	<h3>Transactions</h3>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Purpose</th>
+				<th>Amount</th>
+				<th>Date</th>
+				<th>Payment Method</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var transaction in Model.Transactions)
+			{
+				<tr>
+					<td>@transaction.Purpose</td>
+					<td>@transaction.Amount</td>
+					<td>@transaction.Date.ToShortDateString()</td>
+					<td>@transaction.MOP</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+
+<a class="btn btn-primary" asp-action="Index" asp-controller="Tenant">Back to List</a>

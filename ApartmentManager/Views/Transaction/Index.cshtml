@@ -1,0 +1,29 @@
+﻿@using ApartmentManager.ViewModels.Transaction
+@model IEnumerable<TransactionsViewModel>
+@{
+	ViewData["Title"] = "Transactions";
+}
+<h1>Transactions</h1>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Tenant Name</th>
+			<th>Purpose</th>
+			<th>Amount</th>
+			<th>Date</th>
+			<th>Payment Method</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var transaction in Model)
+		{
+			<tr>
+				<td>@transaction.TenantName</td>
+				<td>@transaction.Purpose</td>
+				<td>@transaction.Amount.ToString("C")</td>
+				<td>@transaction.Date</td>
+				<td>@transaction.MOP</td>
+			</tr>
+		}
+	</tbody>
+</table>

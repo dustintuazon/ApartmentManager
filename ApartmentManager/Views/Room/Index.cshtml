@@ -19,16 +19,22 @@
 							@if(room.IsAvailable)
 							{
 								<div>
-									<a class="btn btn-primary btn-sm align-self-center" asp-controller="Room" asp-action="CreateEditRoom" asp-route-id="@room.Id">Add Tenant</a>
+									<a class="btn btn-primary btn-sm align-self-center" asp-controller="Tenant" asp-action="AddTenant" asp-route-id="@room.Id">Add Tenant</a>
 									<a class="btn btn-primary btn-sm align-self-center" asp-controller="Room" asp-action="CreateEditRoom" asp-route-id="@room.Id"><i class="bi bi-pencil"></i></a>
 								</div>
 							}
 						</div>
 						<p class="card-text my-1">@room.Description</p>
-						<p class="card-text my-1">Monthly: PHP @room.Monthly</p>
+						<p class="card-text my-1">Monthly: @room.Monthly.ToString("C")</p>
 						<p class="card-text my-1">@room.MonthsDeposit Month(s) Deposit</p>
 						<p class="card-text my-1">@room.MonthsAdvance Month(s) Advance</p>
-						<p class="card-text my-1 border d-inline-block px-2 py-1 @(room.IsAvailable ? "border-success text-success" : "border-danger text-danger") rounded">@(room.IsAvailable ? "Available" : "Occupied")</p>
+						<div class="d-flex">
+							<p class="card-text my-1 border d-inline-block px-2 py-1 @(room.IsAvailable ? "border-success text-success" : "border-danger text-danger") rounded">@(room.IsAvailable ? "Available" : "Occupied")</p>
+							@if (!room.IsAvailable)
+							{
+								<p class="card-text align-self-center ps-2">@room.OccupiedBy</p>
+							}
+						</div>
 					</div>
 				</div>
 			</div>

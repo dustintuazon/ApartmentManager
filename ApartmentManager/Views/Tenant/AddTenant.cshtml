@@ -1,0 +1,51 @@
+﻿@using ApartmentManager.ViewModels
+@model AddTenantTransactionViewModelWrapper
+@{
+	ViewData["Title"] = "Add Tenant"; 
+}
+<h1>@ViewData["Title"]</h1>
+<h2>Room: @Model.RoomName</h2>
+
+<form asp-action="AddTenant" method="post" autocomplete="off">
+	@Html.AntiForgeryToken()
+	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+	<div class="mb-3">
+		<label asp-for="CreateEditTenantViewModel.Name" class="form-label"></label>
+		<input asp-for="CreateEditTenantViewModel.Name" class="form-control" />
+		<span asp-validation-for="CreateEditTenantViewModel.Name" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="CreateEditTenantViewModel.Description" class="form-label"></label>
+		<input asp-for="CreateEditTenantViewModel.Description" class="form-control" />
+		<span asp-validation-for="CreateEditTenantViewModel.Description" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="CreateEditTenantViewModel.MoveInDate" class="form-label"></label>
+		<input asp-for="CreateEditTenantViewModel.MoveInDate" class="form-control" />
+		<span asp-validation-for="CreateEditTenantViewModel.MoveInDate" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="CreateEditTenantViewModel.DepositPaid" class="form-label">Deposit: @Model.Deposit.ToString("C")</label>
+		<input asp-for="CreateEditTenantViewModel.DepositPaid" class="form-control" />
+		<span asp-validation-for="CreateEditTenantViewModel.DepositPaid" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="CreateEditTenantViewModel.AdvancePaid" class="form-label">Advance: @Model.Advance.ToString("C")</label>
+		<input asp-for="CreateEditTenantViewModel.AdvancePaid" class="form-control" />
+		<span asp-validation-for="CreateEditTenantViewModel.AdvancePaid" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="CreateTransactionViewModel.ModeOfPayment" class="form-label"></label>
+		<select asp-for="CreateTransactionViewModel.ModeOfPayment" asp-items="Html.GetEnumSelectList<ModeOfPayment>()" class="form-control">
+			<option value="">-- Select MOP --</option>
+		</select>
+		<span asp-validation-for="CreateTransactionViewModel.ModeOfPayment" class="text-danger"></span>
+	</div>
+	<button type="submit" class="btn btn-success">Submit</button>
+</form>
+
+@section Scripts{
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial.cshtml");
+	}
+}
