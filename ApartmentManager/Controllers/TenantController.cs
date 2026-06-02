@@ -43,7 +43,7 @@ namespace ApartmentManager.Controllers
                     Balance = tenant.Balance,
                     DueDate = dueDate,
                     DaysDue = dueDate.DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber,
-                    Paid = dueDate.Month >= DateOnly.FromDateTime(DateTime.Now).Month && dueDate.Year >= DateOnly.FromDateTime(DateTime.Now).Year
+                    Paid = dueDate >= DateOnly.FromDateTime(DateTime.Now)
                 };
                 viewModel.Add(tenantViewModel);
             }

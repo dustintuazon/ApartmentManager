@@ -34,7 +34,7 @@ namespace ApartmentManager.Controllers
                 RoomCount = rooms.Count(),
                 TenantCount = tenants.Count(),
                 AvailableRooms = rooms.Where(r => r.IsAvailable).Count(),
-                UnpaidTenants = tenants.Where(t => !transactions.Any(tr => tr.TenantId == t.Id && (tr.Purpose == Purpose.Monthly || tr.Purpose == Purpose.Advance) && tr.Date.Month == DateTime.Now.Month && tr.Date.Year == DateTime.Now.Year)).Count()
+                UnpaidTenants = tenants.Where(t => !transactions.Any(tr => tr.TenantId == t.Id && (tr.Purpose == Purpose.Monthly || tr.Purpose == Purpose.Advance) && tr.Date < DateOnly.FromDateTime(DateTime.Now))).Count()
             };
             return View(dashboardViewModel);
         }
