@@ -10,8 +10,8 @@
 	<div class="mb-3">
 		<p>Description: @Model.Description</p>
 		<p>Move-in Date: @Model.MoveInDate.ToShortDateString()</p>
-		<p>Balance: @Model.Balance</p>
-		<p>Deposit: @Model.Deposit</p>
+		<p>Balance: @Model.Balance.ToString("C")</p>
+		<p>Deposit: @Model.Deposit.ToString("C")</p>
 	</div>
 </div>
 
@@ -31,7 +31,7 @@
 			{
 				<tr>
 					<td>@transaction.Purpose</td>
-					<td>@transaction.Amount</td>
+					<td>@transaction.Amount.ToString("C")</td>
 					<td>@transaction.Date.ToShortDateString()</td>
 					<td>@transaction.MOP</td>
 				</tr>

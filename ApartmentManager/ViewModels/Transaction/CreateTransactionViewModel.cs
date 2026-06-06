@@ -6,9 +6,11 @@ namespace ApartmentManager.ViewModels.Transaction
     public class CreateTransactionViewModel
     {
         public int TenantId { get; set; }
+        public string TenantName { get; set; } = string.Empty;
         [Required]
         public int Amount { get; set; }
         [Required]
+        [Display(Name = "Date")]
         [DataType(DataType.Date)]
         public DateOnly PaymentDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         [Required]

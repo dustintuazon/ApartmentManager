@@ -38,9 +38,14 @@ namespace ApartmentManager.Services
             }
             else if(processPaymentDto.Purpose == Purpose.Monthly || processPaymentDto.Purpose == Purpose.Advance)
             {
-                var difference = processPaymentDto.Amount - roomMonthly;
+                var months = 1;
+                if(processPaymentDto.Amount % roomMonthly == 0)
+                {
+                    months = processPaymentDto.Amount / roomMonthly;
+                }
+                var difference = processPaymentDto.Amount - roomMonthly * months;
                 tenant.Balance -= difference;
-                tenant.MonthsPaid += 1;
+                tenant.MonthsPaid += months;
             }
             else if(processPaymentDto.Purpose == Purpose.Balance)
             {

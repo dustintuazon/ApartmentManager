@@ -36,7 +36,7 @@
 	</div>
 	<div class="mb-3">
 		<label asp-for="CreateTransactionViewModel.ModeOfPayment" class="form-label"></label>
-		<select asp-for="CreateTransactionViewModel.ModeOfPayment" asp-items="Html.GetEnumSelectList<ModeOfPayment>()" class="form-control">
+		<select asp-for="CreateTransactionViewModel.ModeOfPayment" asp-items="Html.GetEnumSelectList<ModeOfPayment>()" class="form-select">
 			<option value="">-- Select MOP --</option>
 		</select>
 		<span asp-validation-for="CreateTransactionViewModel.ModeOfPayment" class="text-danger"></span>
