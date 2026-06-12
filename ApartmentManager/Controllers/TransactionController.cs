@@ -58,8 +58,8 @@ namespace ApartmentManager.Controllers
             {
                 TenantId = id,
                 Amount = viewModel.Amount,
-                Purpose = viewModel.Purpose,
-                MOP = viewModel.ModeOfPayment,
+                Purpose = (Purpose)viewModel.Purpose,
+                MOP = (ModeOfPayment)viewModel.ModeOfPayment,
                 DatePaid = viewModel.PaymentDate,
                 UserId = _userManager.GetUserId(User)
             };

@@ -82,7 +82,6 @@ namespace ApartmentManager.Controllers
 
                 var room = await _context.Rooms.FindAsync(id);
                 if (room == null) return NotFound();
-                room.IsAvailable = false;
                 var newTenant = new Tenant
                 {
                     Name = tenant.Name,
@@ -98,7 +97,7 @@ namespace ApartmentManager.Controllers
                     TenantId = newTenant.Id,
                     Amount = tenant.DepositPaid,
                     Purpose = Purpose.Deposit,
-                    MOP = transaction.ModeOfPayment,
+                    MOP = (ModeOfPayment)transaction.ModeOfPayment,
                     DatePaid = transaction.PaymentDate,
                     //ReferenceNumber = transaction.ReferenceNumber,
                     UserId = userId
@@ -139,8 +138,28 @@ namespace ApartmentManager.Controllers
                     ReferenceNumber = t.ReferenceNumber?.ToString() ?? ""
                 }).ToList()
             };
+            var moveOutDateViewModel = new MoveOutDateViewModel
+            {
+                MoveOutDate = tenant.MoveOutDate ?? DateOnly.FromDateTime(DateTime.Now)
+            };
+            var viewModelWrapper = new ViewTenantViewModelWrapper
+            {
+                ViewTenantViewModel = viewModel,
+                MoveOutDateViewModel = moveOutDateViewModel
+            };
+            return View(viewModelWrapper);
+        }
 
-            return View(viewModel);
+        [HttpPost]
+        public async Task<IActionResult> UpdateMoveOutDate(int id, ViewTenantViewModelWrapper viewModel)
+        {
+            var tenant = await _context.Tenants.FindAsync(id);
+            var moveOutDate = viewModel.MoveOutDateViewModel.MoveOutDate;
+            tenant.MoveOutDate = moveOutDate;
+            await _context.SaveChangesAsync();
+
+
+            return RedirectToAction("ViewTenant", new { id = id });
         }
     }
 }

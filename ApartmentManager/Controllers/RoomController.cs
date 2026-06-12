@@ -28,7 +28,6 @@ namespace ApartmentManager.Controllers
                 Id = r.Id,
                 Name = r.Name,
                 Description = r.Description,
-                IsAvailable = r.IsAvailable,
                 Monthly = r.Monthly,
                 MonthsDeposit = r.Deposit,
                 MonthsAdvance = r.Advance,
@@ -42,9 +41,12 @@ namespace ApartmentManager.Controllers
         {
             if (id != null)
             {
-                var room = await _context.Rooms.FindAsync(id);
+                var room = await _context.Rooms.Include(r => r.Tenants!.Where(t => t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now))).FirstOrDefaultAsync(r => r.Id == id);
                 if (room == null) return NotFound();
-                if (!room.IsAvailable) return RedirectToAction("Index", "Room");
+                if(room.Tenants?.Count > 0)
+                {
+                    return BadRequest("Cannot edit a room that is currently rented.");
+                }
                 var viewModel = new CreateEditRoomViewModel
                 {
                     Id = room.Id,
@@ -80,12 +82,12 @@ namespace ApartmentManager.Controllers
             }
             if (id != null)
             {
-                var room = await _context.Rooms.FindAsync(id);
+                var room = await _context.Rooms.Include(r => r.Tenants.Where(t=>t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now))).FirstOrDefaultAsync(r=>r.Id == id);
                 if (room == null)
                 {
                     return NotFound();
                 }
-                if (!room.IsAvailable)
+                if (room.Tenants?.Count > 0)
                 {
                     ModelState.AddModelError(string.Empty, "Cannot edit a room that is currently rented.");
                     return View(model);

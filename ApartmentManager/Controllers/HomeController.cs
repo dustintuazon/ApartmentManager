@@ -33,7 +33,7 @@ namespace ApartmentManager.Controllers
                 MonthIncome = transactions.Where(t => t.Date.Month == DateTime.Now.Month && t.Date.Year == DateTime.Now.Year && t.UserId == userId && t.Purpose == Purpose.Monthly).Sum(t => t.Amount),
                 RoomCount = rooms.Count(),
                 TenantCount = tenants.Count(),
-                AvailableRooms = rooms.Where(r => r.IsAvailable).Count(),
+                AvailableRooms = rooms.Where(r => !tenants.Any(t => t.RoomId == r.Id)).Count(),
                 UnpaidTenants = tenants.Where(t => !transactions.Any(tr => tr.TenantId == t.Id && (tr.Purpose == Purpose.Monthly || tr.Purpose == Purpose.Advance) && t.MoveInDate.AddMonths(t.MonthsPaid) > DateOnly.FromDateTime(DateTime.Now))).Count()
             };
             return View(dashboardViewModel);

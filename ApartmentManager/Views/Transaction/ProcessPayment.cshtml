@@ -27,7 +27,7 @@
 	</div>
 	<div class="mb-3">
 		<label asp-for="ModeOfPayment" class="form-label"></label>
-		<select asp-for="ModeOfPayment" asp-items="Html.GetEnumSelectList<ModeOfPayment>()" class="form-select">
+		<select asp-for="ModeOfPayment" asp-items="Html.GetEnumSelectList<ModeOfPayment>().Reverse()" class="form-select">
 			<option value="">-- Select Mode of Payment --</option>
 		</select>
 		<span asp-validation-for="ModeOfPayment" class="text-danger"></span>

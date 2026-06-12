@@ -1,21 +1,48 @@
 ﻿@using ApartmentManager.ViewModels.Tenant
-@model ViewTenantViewModel
+@model ViewTenantViewModelWrapper
 @{
 	ViewData["Title"] = "Tenant Details"; 
 }
 
 <div class="container">
-	<h3>Tenant: @Model.TenantName</h3>
-	<h4>Room: @Model.RoomName</h4>
+	<h3>Tenant: @Model.ViewTenantViewModel.TenantName</h3>
+	<h4>Room: @Model.ViewTenantViewModel.RoomName</h4>
 	<div class="mb-3">
-		<p>Description: @Model.Description</p>
-		<p>Move-in Date: @Model.MoveInDate.ToShortDateString()</p>
-		<p>Balance: @Model.Balance.ToString("C")</p>
-		<p>Deposit: @Model.Deposit.ToString("C")</p>
+		<p>Description: @Model.ViewTenantViewModel.Description</p>
+		<p>Move-in Date: @Model.ViewTenantViewModel.MoveInDate.ToShortDateString()</p>
+		@if (Model.ViewTenantViewModel.MoveOutDate is not null)
+		{
+			<p>Move-out Date: @Model.ViewTenantViewModel.MoveOutDate?.ToShortDateString()</p>
+		}
+		<p>Balance: @Model.ViewTenantViewModel.Balance.ToString("C")</p>
+		<p>Deposit: @Model.ViewTenantViewModel.Deposit.ToString("C")</p>
 	</div>
 </div>
-
-<div class="container">
+@if (Model.ViewTenantViewModel.MoveOutDate > DateOnly.FromDateTime(DateTime.Now) || Model.ViewTenantViewModel.MoveOutDate is null)
+{
+	<div class="row">
+		<div class="col-lg-3">
+			<button class="btn btn-danger" type="button" data-bs-toggle="collapse" data-bs-target="#moveOutDateCollapse" aria-expanded="false" aria-controls="moveOutDateCollapse">
+				@(Model.ViewTenantViewModel.MoveOutDate is null ? "Set" : "Change") Move-out Date
+			</button>
+		</div>
+	</div>
+	<div class="row collapse mt-3" id="moveOutDateCollapse">
+		<div class="col-lg-6">
+			<div class="card card-body">
+				<form asp-action="UpdateMoveOutDate" method="post" asp-route-id="@Model.ViewTenantViewModel.TenantId">
+					<div class="form-group mb-3">
+						<label asp-for="MoveOutDateViewModel.MoveOutDate" class="control-label"></label>
+						<input asp-for="MoveOutDateViewModel.MoveOutDate" class="form-control" />
+						<span asp-validation-for="MoveOutDateViewModel.MoveOutDate" class="text-danger"></span>
+					</div>
+					<button type="submit" class="btn btn-success">@(Model.ViewTenantViewModel.MoveOutDate is null ? "Set" : "Change") Move-out Date</button>
+				</form>
+			</div>
+		</div>
+	</div>
+}
+<div class="container mt-3">
 	<h3>Transactions</h3>
 	<table class="table">
 		<thead>
@@ -27,7 +54,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (var transaction in Model.Transactions)
+			@foreach (var transaction in Model.ViewTenantViewModel.Transactions)
 			{
 				<tr>
 					<td>@transaction.Purpose</td>
