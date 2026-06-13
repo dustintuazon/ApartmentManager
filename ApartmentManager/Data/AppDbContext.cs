@@ -17,5 +17,15 @@ namespace ApartmentManager.Data
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Tenant> Tenants { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Room>()
+                .HasMany(r => r.Tenants)
+                .WithOne(t => t.Room)
+                .HasForeignKey(t => t.RoomId)
+                .OnDelete(DeleteBehavior.NoAction);
+        }
     }
 }

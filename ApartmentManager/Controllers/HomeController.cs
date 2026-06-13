@@ -24,13 +24,17 @@ namespace ApartmentManager.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
+            var transactions = await _context.Transactions.Where(t => t.UserId == userId).ToListAsync();
+            var rooms = await _context.Rooms.Where(r => r.UserId == userId).ToListAsync();
+            var tenants = await _context.Tenants.Where(t => t.UserId == userId && (t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now))).ToListAsync();
             var dashboardViewModel = new DashboardViewModel
             {
-                YearIncome = await _context.Transactions.Where(t => t.Date.Year == DateTime.Now.Year && t.UserId == userId).SumAsync(t => t.Amount),
-                MonthIncome = await _context.Transactions.Where(t => t.Date.Month == DateTime.Now.Month && t.Date.Year == DateTime.Now.Year && t.UserId == userId).SumAsync(t => t.Amount),
-                RoomCount = await _context.Rooms.Where(r=>r.UserId == userId).CountAsync(),
-                TenantCount = await _context.Tenants.Where(t => t.UserId == userId && (t.Status == Status.Settled || t.Status == Status.MovingOut)).CountAsync(),
-                AvailableRooms = await _context.Rooms.Where(r => r.IsAvailable && r.UserId == userId).CountAsync()
+                YearIncome = transactions.Where(t => t.Date.Year == DateTime.Now.Year && t.Purpose == Purpose.Monthly).Sum(t => t.Amount),
+                MonthIncome = transactions.Where(t => t.Date.Month == DateTime.Now.Month && t.Date.Year == DateTime.Now.Year && t.UserId == userId && t.Purpose == Purpose.Monthly).Sum(t => t.Amount),
+                RoomCount = rooms.Count(),
+                TenantCount = tenants.Count(),
+                AvailableRooms = rooms.Where(r => !tenants.Any(t => t.RoomId == r.Id)).Count(),
+                UnpaidTenants = tenants.Where(t => !transactions.Any(tr => tr.TenantId == t.Id && (tr.Purpose == Purpose.Monthly || tr.Purpose == Purpose.Advance) && t.MoveInDate.AddMonths(t.MonthsPaid) > DateOnly.FromDateTime(DateTime.Now))).Count()
             };
             return View(dashboardViewModel);
         }

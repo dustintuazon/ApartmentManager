@@ -22,16 +22,16 @@ namespace ApartmentManager.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var rooms = await _context.Rooms.Where(r => r.UserId == _userManager.GetUserId(User)).OrderBy(r => r.Name).ToListAsync();
+            var rooms = await _context.Rooms.Include(r=>r.Tenants).Where(r => r.UserId == _userManager.GetUserId(User) && !r.IsArchived).OrderBy(r => r.Name).ToListAsync();
             var roomViewModels = rooms.Select(r => new ViewRoomViewModel
             {
                 Id = r.Id,
                 Name = r.Name,
                 Description = r.Description,
-                IsAvailable = r.IsAvailable,
                 Monthly = r.Monthly,
                 MonthsDeposit = r.Deposit,
-                MonthsAdvance = r.Advance
+                MonthsAdvance = r.Advance,
+                OccupiedBy = r.Tenants?.Where(t => t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now)).FirstOrDefault()?.Name
             }).ToList();
             return View(roomViewModels);
         }
@@ -41,9 +41,12 @@ namespace ApartmentManager.Controllers
         {
             if (id != null)
             {
-                var room = await _context.Rooms.FindAsync(id);
+                var room = await _context.Rooms.Include(r => r.Tenants!.Where(t => t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now))).FirstOrDefaultAsync(r => r.Id == id);
                 if (room == null) return NotFound();
-                if (!room.IsAvailable) return RedirectToAction("Index", "Room");
+                if(room.Tenants?.Count > 0)
+                {
+                    return BadRequest("Cannot edit a room that is currently rented.");
+                }
                 var viewModel = new CreateEditRoomViewModel
                 {
                     Id = room.Id,
@@ -59,14 +62,19 @@ namespace ApartmentManager.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateEditRoom(int? id, CreateEditRoomViewModel model)
         {
-
+            var userId = _userManager.GetUserId(User);
+            if(userId == null)
+            {
+                return Unauthorized();
+            }
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
-            var existingRoom = await _context.Rooms.AnyAsync(r=> r.Name == model.Name && r.UserId == _userManager.GetUserId(User) && r.Id != id);
+            var existingRoom = await _context.Rooms.AnyAsync(r=> r.Name == model.Name && r.UserId == userId && r.Id != id);
             if(existingRoom)
             {
                 ModelState.AddModelError("Name", "A room with this name already exists.");
@@ -74,12 +82,12 @@ namespace ApartmentManager.Controllers
             }
             if (id != null)
             {
-                var room = await _context.Rooms.FindAsync(id);
+                var room = await _context.Rooms.Include(r => r.Tenants.Where(t=>t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now))).FirstOrDefaultAsync(r=>r.Id == id);
                 if (room == null)
                 {
                     return NotFound();
                 }
-                if (!room.IsAvailable)
+                if (room.Tenants?.Count > 0)
                 {
                     ModelState.AddModelError(string.Empty, "Cannot edit a room that is currently rented.");
                     return View(model);
@@ -99,7 +107,7 @@ namespace ApartmentManager.Controllers
                     Monthly = model.Monthly,
                     Deposit = model.MonthsDeposit,
                     Advance = model.MonthsAdvanced,
-                    UserId = _userManager.GetUserId(User)
+                    UserId = userId
                 };
                 _context.Rooms.Add(newRoom);
             }

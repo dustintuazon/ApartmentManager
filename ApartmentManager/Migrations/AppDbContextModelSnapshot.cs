@@ -40,7 +40,7 @@ namespace ApartmentManager.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsAvailable")
+                    b.Property<bool>("IsArchived")
                         .HasColumnType("bit");
 
                     b.Property<int>("Monthly")
@@ -75,6 +75,10 @@ namespace ApartmentManager.Migrations
                     b.Property<int>("Deposit")
                         .HasColumnType("int");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("MonthsPaid")
                         .HasColumnType("int");
 
@@ -88,10 +92,7 @@ namespace ApartmentManager.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RoomId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
+                    b.Property<int>("RoomId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -100,9 +101,7 @@ namespace ApartmentManager.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomId")
-                        .IsUnique()
-                        .HasFilter("[RoomId] IS NOT NULL");
+                    b.HasIndex("RoomId");
 
                     b.HasIndex("UserId");
 
@@ -359,8 +358,10 @@ namespace ApartmentManager.Migrations
             modelBuilder.Entity("ApartmentManager.Models.Tenant", b =>
                 {
                     b.HasOne("ApartmentManager.Models.Room", "Room")
-                        .WithOne("Tenant")
-                        .HasForeignKey("ApartmentManager.Models.Tenant", "RoomId");
+                        .WithMany("Tenants")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("ApartmentManager.Models.User", "User")
                         .WithMany("Tenants")
@@ -443,7 +444,7 @@ namespace ApartmentManager.Migrations
 
             modelBuilder.Entity("ApartmentManager.Models.Room", b =>
                 {
-                    b.Navigation("Tenant");
+                    b.Navigation("Tenants");
                 });
 
             modelBuilder.Entity("ApartmentManager.Models.Tenant", b =>

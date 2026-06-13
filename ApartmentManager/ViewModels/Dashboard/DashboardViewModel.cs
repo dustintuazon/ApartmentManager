@@ -7,5 +7,6 @@
         public int RoomCount { get; set; }
         public int TenantCount { get; set; }
         public int AvailableRooms { get; set; }
+        public int UnpaidTenants { get; set; }
     }
 }

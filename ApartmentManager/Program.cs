@@ -1,4 +1,5 @@
 using ApartmentManager.Data;
+using ApartmentManager.Interfaces;
 using ApartmentManager.Models;
 using ApartmentManager.Services;
 using Microsoft.AspNetCore.Identity;
@@ -18,8 +19,10 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
+    options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 var app = builder.Build();
 

@@ -6,10 +6,10 @@
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public int Monthly { get; set; }
-        public bool IsAvailable { get; set; } = true;
         public int Deposit { get; set; }
         public int Advance { get; set; }
-        public Tenant? Tenant { get; set; }
+        public bool IsArchived { get; set; } = false;
+        public ICollection<Tenant>? Tenants  { get; set; }
         public string UserId { get; set; } = string.Empty;
         public User? User { get; set; }
     }
