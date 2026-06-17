@@ -15,7 +15,10 @@
 						<div class="d-flex justify-content-between">
 							<h4 class="card-title">@tenant.TenantName</h4>
 							<div>
-								<a class="btn btn-primary btn-sm align-self-center my-1" asp-controller="Transaction" asp-action="ProcessPayment" asp-route-id="@tenant.TenantId">Post Payment</a>
+								@if (!tenant.UseAdvance)
+								{
+									<a class="btn btn-primary btn-sm align-self-center my-1" asp-controller="Transaction" asp-action="ProcessPayment" asp-route-id="@tenant.TenantId">Post Payment</a>
+								}
 								<a class="btn btn-primary btn-sm align-self-center" asp-controller="Tenant" asp-action="ViewTenant" asp-route-id="@tenant.TenantId"><i class="bi bi-eye"></i></a>
 							</div>
 						</div>
@@ -31,7 +34,7 @@
 						</div>
 						<p class="card-text my-1">Deposit: @tenant.Deposit.ToString("C")</p>
 						<p class="card-text my-1">Balance: @tenant.Balance.ToString("C")</p>
-						<p class="card-text my-1">Due Date: @tenant.DueDate.ToString("d")</p>
+						<p class="card-text my-1">@(tenant.UseAdvance ? "Move Out Date: " + tenant.MoveOutDate?.ToString("d") : "Due Date: " + tenant.DueDate.ToString("d"))</p>
 						<p class="card-text my-1">@(tenant.DaysDue >= 0 ? "Due in" : "Overdue for") @Math.Abs(tenant.DaysDue) Days</p>
 					</div>
 				</div>

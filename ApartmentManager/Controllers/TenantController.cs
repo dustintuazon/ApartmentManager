@@ -34,6 +34,15 @@ namespace ApartmentManager.Controllers
             foreach(var tenant in tenants)
             {
                 var dueDate = tenant.MoveInDate.AddMonths(tenant.MonthsPaid);
+                var useAdvance = false;
+                if (tenant.MoveOutDate != null)
+                {
+                    var monthBeforeMoveOut = tenant.MoveOutDate.Value.AddMonths(-1);
+                    if (monthBeforeMoveOut < dueDate)
+                    {
+                        useAdvance = true;
+                    }
+                }
                 var tenantViewModel = new TenantsViewModel
                 {
                     TenantId = tenant.Id,
@@ -44,7 +53,9 @@ namespace ApartmentManager.Controllers
                     DueDate = dueDate,
                     DaysDue = dueDate.DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber,
                     Paid = dueDate >= DateOnly.FromDateTime(DateTime.Now),
-                    MovingOut = tenant.MoveOutDate != null
+                    MovingOut = tenant.MoveOutDate != null,
+                    UseAdvance = useAdvance,
+                    MoveOutDate = tenant.MoveOutDate
                 };
                 viewModel.Add(tenantViewModel);
             }
