@@ -10,5 +10,6 @@
         public DateOnly DueDate { get; set; }
         public int DaysDue { get; set; }
         public bool Paid { get; set; }
+        public bool MovingOut { get; set; }
     }
 }
