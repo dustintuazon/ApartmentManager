@@ -73,6 +73,7 @@ namespace ApartmentManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddTenant(int id, AddTenantTransactionViewModelWrapper viewModelWrapper)
         {
+            ModelState.Remove("CreateTransactionViewModel.Purpose");
             if (ModelState.IsValid)
             {
                 var userId = _userManager.GetUserId(User);
