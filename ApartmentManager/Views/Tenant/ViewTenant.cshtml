@@ -22,6 +22,7 @@
 {
 	<div class="row">
 		<div class="col-lg-3">
+			<p>@Model.MoveOutDateViewModel.ResultMessage</p>
 			<button class="btn btn-danger" type="button" data-bs-toggle="collapse" data-bs-target="#moveOutDateCollapse" aria-expanded="false" aria-controls="moveOutDateCollapse">
 				@(Model.ViewTenantViewModel.MoveOutDate is null ? "Set" : "Change") Move-out Date
 			</button>
@@ -31,6 +32,7 @@
 		<div class="col-lg-6">
 			<div class="card card-body">
 				<form asp-action="UpdateMoveOutDate" method="post" asp-route-id="@Model.ViewTenantViewModel.TenantId">
+					@Html.AntiForgeryToken()
 					<div class="form-group mb-3">
 						<label asp-for="MoveOutDateViewModel.MoveOutDate" class="control-label"></label>
 						<input asp-for="MoveOutDateViewModel.MoveOutDate" class="form-control" />
