@@ -34,6 +34,15 @@ namespace ApartmentManager.Controllers
             foreach(var tenant in tenants)
             {
                 var dueDate = tenant.MoveInDate.AddMonths(tenant.MonthsPaid);
+                var useAdvance = false;
+                if (tenant.MoveOutDate != null)
+                {
+                    var monthBeforeMoveOut = tenant.MoveOutDate.Value.AddMonths(-1);
+                    if (monthBeforeMoveOut < dueDate)
+                    {
+                        useAdvance = true;
+                    }
+                }
                 var tenantViewModel = new TenantsViewModel
                 {
                     TenantId = tenant.Id,
@@ -43,7 +52,10 @@ namespace ApartmentManager.Controllers
                     Balance = tenant.Balance,
                     DueDate = dueDate,
                     DaysDue = dueDate.DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber,
-                    Paid = dueDate >= DateOnly.FromDateTime(DateTime.Now)
+                    Paid = dueDate >= DateOnly.FromDateTime(DateTime.Now),
+                    MovingOut = tenant.MoveOutDate != null,
+                    UseAdvance = useAdvance,
+                    MoveOutDate = tenant.MoveOutDate
                 };
                 viewModel.Add(tenantViewModel);
             }
@@ -73,6 +85,7 @@ namespace ApartmentManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddTenant(int id, AddTenantTransactionViewModelWrapper viewModelWrapper)
         {
+            ModelState.Remove("CreateTransactionViewModel.Purpose");
             if (ModelState.IsValid)
             {
                 var userId = _userManager.GetUserId(User);
@@ -140,6 +153,7 @@ namespace ApartmentManager.Controllers
             };
             var moveOutDateViewModel = new MoveOutDateViewModel
             {
+                ResultMessage = TempData["ResultMessage"]?.ToString() ?? "",
                 MoveOutDate = tenant.MoveOutDate ?? DateOnly.FromDateTime(DateTime.Now)
             };
             var viewModelWrapper = new ViewTenantViewModelWrapper
@@ -151,14 +165,20 @@ namespace ApartmentManager.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateMoveOutDate(int id, ViewTenantViewModelWrapper viewModel)
         {
             var tenant = await _context.Tenants.FindAsync(id);
             var moveOutDate = viewModel.MoveOutDateViewModel.MoveOutDate;
+            if(moveOutDate < DateOnly.FromDateTime(DateTime.Now))
+            {
+                TempData["ResultMessage"] = "Move out date cannot be in the past.";
+                return RedirectToAction("ViewTenant", new { id = id });
+            }
             tenant.MoveOutDate = moveOutDate;
             await _context.SaveChangesAsync();
 
-
+            TempData["ResultMessage"] = "Move out date updated successfully.";
             return RedirectToAction("ViewTenant", new { id = id });
         }
     }

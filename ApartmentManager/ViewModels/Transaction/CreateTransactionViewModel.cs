@@ -13,7 +13,7 @@ namespace ApartmentManager.ViewModels.Transaction
         [Display(Name = "Date")]
         [DataType(DataType.Date)]
         public DateOnly PaymentDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
-        //[Required]
+        [Required]
         public Purpose? Purpose { get; set; }
         [Required]
         [Display(Name = "Mode of Payment")]

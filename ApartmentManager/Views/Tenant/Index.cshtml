@@ -9,25 +9,32 @@
 	<div class="row">
 		@foreach (var tenant in Model)
 		{
-			<div class="col-lg-3">
+			<div class="col-xl-3 col-lg-4">
 				<div class="card mb-3 border-2 @(tenant.Paid ? "border-success" : "border-danger")">
 					<div class="card-body">
 						<div class="d-flex justify-content-between">
 							<h4 class="card-title">@tenant.TenantName</h4>
 							<div>
-								<a class="btn btn-primary btn-sm align-self-center" asp-controller="Transaction" asp-action="ProcessPayment" asp-route-id="@tenant.TenantId">Post Payment</a>
+								@if (!tenant.UseAdvance)
+								{
+									<a class="btn btn-primary btn-sm align-self-center my-1" asp-controller="Transaction" asp-action="ProcessPayment" asp-route-id="@tenant.TenantId">Post Payment</a>
+								}
 								<a class="btn btn-primary btn-sm align-self-center" asp-controller="Tenant" asp-action="ViewTenant" asp-route-id="@tenant.TenantId"><i class="bi bi-eye"></i></a>
 							</div>
 						</div>
 						<div class="d-flex justify-content-between">
 							<h5 class="card-text my-1">Room: @tenant.RoomName</h5>
 							<div>
+								@if (tenant.MovingOut)
+								{
+									<p class="card-text my-1 border d-inline-block px-2 py-1 border-danger text-danger rounded">Moving Out</p>
+								}
 								<p class="card-text my-1 border d-inline-block px-2 py-1 @(tenant.Paid ? "border-success text-success" : "border-danger text-danger") rounded">@(tenant.Paid ? "Paid" : "Unpaid")</p>
 							</div>
 						</div>
 						<p class="card-text my-1">Deposit: @tenant.Deposit.ToString("C")</p>
 						<p class="card-text my-1">Balance: @tenant.Balance.ToString("C")</p>
-						<p class="card-text my-1">Due Date: @tenant.DueDate.ToString("d")</p>
+						<p class="card-text my-1">@(tenant.UseAdvance ? "Move Out Date: " + tenant.MoveOutDate?.ToString("d") : "Due Date: " + tenant.DueDate.ToString("d"))</p>
 						<p class="card-text my-1">@(tenant.DaysDue >= 0 ? "Due in" : "Overdue for") @Math.Abs(tenant.DaysDue) Days</p>
 					</div>
 				</div>
