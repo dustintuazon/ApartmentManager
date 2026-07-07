@@ -22,9 +22,15 @@ namespace ApartmentManager.Controllers
             _paymentService = paymentService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(DateOnly? filterDate)
         {
-            var transactions = await _context.Transactions.Include(t=>t.Tenant).Where(t=> t.UserId == _userManager.GetUserId(User)).OrderByDescending(t=>t.Date).ToListAsync();
+            ViewData["FilterDate"] = filterDate?.ToString("yyyy-MM-dd");
+            var transactions = await _context.Transactions.Include(t => t.Tenant).Where(t => t.UserId == _userManager.GetUserId(User)).OrderByDescending(t => t.Date).ToListAsync();
+
+            if (filterDate != null)
+            {
+                transactions = transactions.Where(t => t.Date == filterDate).ToList();
+            }
 
             var viewModel = transactions.Select(t => new TransactionsViewModel
             {

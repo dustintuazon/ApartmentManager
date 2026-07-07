@@ -3,7 +3,12 @@
 @{
 	ViewData["Title"] = "Transactions";
 }
-<h1>Transactions</h1>
+<div class="d-flex justify-content-between">
+	<h1>Transactions</h1>
+	<form asp-action="Index" method="get">
+		<input class="form-control" type="date" name="filterDate" value="@ViewData["FilterDate"]" onchange="this.form.submit();"/>
+	</form>
+</div>
 <table class="table">
 	<thead>
 		<tr>
