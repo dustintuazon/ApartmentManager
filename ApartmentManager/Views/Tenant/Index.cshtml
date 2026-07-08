@@ -24,8 +24,10 @@
 				{
 					<input hidden name="sortOrder" value="@ViewData["SortOrder"]" />
 				}
-				<input type="text" name="searchString" value="@ViewData["SearchString"]" class="form-control" />
-				<button type="submit" class="btn btn-primary">Search</button>
+				<div class="input-group">
+					<input type="text" name="searchString" value="@ViewData["SearchString"]" class="form-control" />
+					<button type="submit" class="btn btn-primary">Search</button>
+				</div>
 			</div>
 		</form>
 	</div>
