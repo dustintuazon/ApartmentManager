@@ -3,7 +3,19 @@
 @{
 	ViewData["Title"] = "Tenants";
 }
-<h1>Tenants</h1>
+<div class="d-flex justify-content-between">
+	<div>
+		<h1>Tenants</h1>
+	</div>
+	<div>
+		<form method="get" asp-action="Index">
+			<div class="d-flex align-items-center gap-2">
+				<label for="sortOrder" class="text-nowrap">Sort By:</label>
+				@Html.DropDownList("sortOrder", (SelectList)ViewBag.SortList, new { @class = "form-control", onchange = "this.form.submit();" })
+			</div>
+		</form>
+	</div>
+</div>
 
 <div class="container-md">
 	<div class="row">
