@@ -3,15 +3,30 @@
 @{
 	ViewData["Title"] = "Tenants";
 }
-<div class="d-flex justify-content-between">
+<div class="d-flex justify-content-between gap-4">
 	<div>
 		<h1>Tenants</h1>
 	</div>
-	<div>
+	<div class="d-md-flex justify-content-between gap-sm-3 mb-3">
 		<form method="get" asp-action="Index">
-			<div class="d-flex align-items-center gap-2">
+			<div class="d-flex align-items-center gap-2 mb-1 mb-md-0">
+				@if (!string.IsNullOrEmpty(ViewData["SearchString"] as string))
+				{
+					<input hidden name="searchString" value="@ViewData["SearchString"]" />
+				}
 				<label for="sortOrder" class="text-nowrap">Sort By:</label>
 				@Html.DropDownList("sortOrder", (SelectList)ViewBag.SortList, new { @class = "form-control", onchange = "this.form.submit();" })
+			</div>
+		</form>
+		<form method="get" asp-action="Index">
+			<div class="d-flex align-items-center gap-2">
+				@if(!string.IsNullOrEmpty(ViewData["SortOrder"] as string))
+				{
+					<input hidden name="sortOrder" value="@ViewData["SortOrder"]" />
+				}
+				<label for="searchString" class="text-nowrap">Search:</label>
+				<input type="text" name="searchString" value="@ViewData["SearchString"]" class="form-control" />
+				<button type="submit" class="btn btn-primary">Search</button>
 			</div>
 		</form>
 	</div>

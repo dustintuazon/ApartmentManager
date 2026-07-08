@@ -27,9 +27,10 @@ namespace ApartmentManager.Controllers
             _paymentService = paymentService;
         }
 
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
             ViewData["CurrentSort"] = sortOrder;
+            ViewData["SearchString"] = searchString;
 
             var sortOptions = new List<SelectListItem>
             {
@@ -41,6 +42,11 @@ namespace ApartmentManager.Controllers
             ViewBag.SortList = new SelectList(sortOptions, "Value", "Text", sortOrder);
 
             var tenants = await _context.Tenants.Include(r=>r.Room).Where(t => t.UserId == _userManager.GetUserId(User) && (t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now))).ToListAsync();
+            
+            if(!string.IsNullOrEmpty(searchString))
+            {
+                tenants = tenants.Where(t => t.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
 
             switch (sortOrder)
             {
