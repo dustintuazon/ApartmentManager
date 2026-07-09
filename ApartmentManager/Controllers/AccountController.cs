@@ -22,10 +22,17 @@ namespace ApartmentManager.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
+            ViewData["SearchString"] = searchString;
+
             var accounts = await userManager.Users.Include(r=>r.Rooms).OrderBy(u => u.UserName).ToListAsync();
             
+            if(!string.IsNullOrEmpty(searchString))
+            {
+                accounts = accounts.Where(a => a.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase) || a.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
             List<ViewUserViewModel> accountsViewModel = new List<ViewUserViewModel>();
 
             foreach(var account in accounts)

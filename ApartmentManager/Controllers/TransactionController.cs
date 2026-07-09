@@ -22,10 +22,16 @@ namespace ApartmentManager.Controllers
             _paymentService = paymentService;
         }
 
-        public async Task<IActionResult> Index(DateOnly? filterDate)
+        public async Task<IActionResult> Index(DateOnly? filterDate, string searchName)
         {
             ViewData["FilterDate"] = filterDate?.ToString("yyyy-MM-dd");
+            ViewData["SearchName"] = searchName;
             var transactions = await _context.Transactions.Include(t => t.Tenant).Where(t => t.UserId == _userManager.GetUserId(User)).OrderByDescending(t => t.Date).ToListAsync();
+
+            if(!string.IsNullOrEmpty(searchName))
+            {
+                transactions = transactions.Where(t => t.Tenant.Name.Contains(searchName, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
 
             if (filterDate != null)
             {
@@ -60,6 +66,12 @@ namespace ApartmentManager.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessPayment(int id, CreateTransactionViewModel viewModel)
         {
+            if(viewModel == null) return NotFound();
+            if(viewModel.Amount <= 0)
+            {
+                ModelState.AddModelError("Amount", "Amount must be greater than zero.");
+            }
+
             var dto = new ProcessPaymentDto
             {
                 TenantId = id,

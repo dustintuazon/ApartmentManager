@@ -4,6 +4,8 @@ using ApartmentManager.ViewModels.Room;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApartmentManager.Controllers
@@ -20,9 +22,45 @@ namespace ApartmentManager.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, string sortOrder)
         {
+            ViewData["SearchString"] = searchString;
+            ViewData["SortOrder"] = sortOrder;
+
+            var sortList = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "name-asc", Text = "Name (Asc)" },
+                new SelectListItem { Value = "name-desc", Text = "Name (Desc)" },
+                new SelectListItem { Value = "available-asc", Text = "Available" },
+                new SelectListItem { Value = "available-desc", Text = "Occupied" }
+            };
+
+            ViewBag.SortList = new SelectList(sortList, "Value", "Text", sortOrder);
+
+
             var rooms = await _context.Rooms.Include(r=>r.Tenants).Where(r => r.UserId == _userManager.GetUserId(User) && !r.IsArchived).OrderBy(r => r.Name).ToListAsync();
+            
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                rooms = rooms.Where(r => r.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            switch (sortOrder)
+            {
+                case "name-desc":
+                    rooms = rooms.OrderByDescending(r => r.Name).ToList();
+                    break;
+                case "available-asc":
+                    rooms = rooms.OrderBy(r => r.Tenants?.Any(t => t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now)) ?? false).ToList();
+                    break;
+                case "available-desc":
+                    rooms = rooms.OrderByDescending(r => r.Tenants?.Any(t => t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now)) ?? false).ToList();
+                    break;
+                default:
+                    rooms = rooms.OrderBy(r => r.Name).ToList();
+                    break;
+            }
+
             var roomViewModels = rooms.Select(r => new ViewRoomViewModel
             {
                 Id = r.Id,

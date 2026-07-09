@@ -27,9 +27,43 @@ namespace ApartmentManager.Controllers
             _paymentService = paymentService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["SearchString"] = searchString;
+
+            var sortOptions = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Name (Asc)", Value = "name_asc" },
+                new SelectListItem { Text = "Name (Desc)", Value = "name_desc" },
+                new SelectListItem { Text = "Status (Paid)", Value = "status_asc" },
+                new SelectListItem { Text = "Status (Unpaid)", Value = "status_desc" }
+            };
+            ViewBag.SortList = new SelectList(sortOptions, "Value", "Text", sortOrder);
+
             var tenants = await _context.Tenants.Include(r=>r.Room).Where(t => t.UserId == _userManager.GetUserId(User) && (t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now))).ToListAsync();
+            
+            if(!string.IsNullOrEmpty(searchString))
+            {
+                tenants = tenants.Where(t => t.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    tenants = tenants.OrderByDescending(t => t.Name).ToList();
+                    break;
+                case "status_desc":
+                    tenants = tenants.OrderBy(t => t.MoveInDate.AddMonths(t.MonthsPaid).DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber).ToList();
+                    break;
+                case "status_asc":
+                    tenants = tenants.OrderByDescending(t => t.MoveInDate.AddMonths(t.MonthsPaid).DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber).ToList();
+                    break;
+                default:
+                    tenants = tenants.OrderBy(t => t.Name).ToList();
+                    break;
+            }
+
             var viewModel = new List<TenantsViewModel>();
             foreach(var tenant in tenants)
             {
