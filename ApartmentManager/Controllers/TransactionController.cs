@@ -66,6 +66,12 @@ namespace ApartmentManager.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessPayment(int id, CreateTransactionViewModel viewModel)
         {
+            if(viewModel == null) return NotFound();
+            if(viewModel.Amount <= 0)
+            {
+                ModelState.AddModelError("Amount", "Amount must be greater than zero.");
+            }
+
             var dto = new ProcessPaymentDto
             {
                 TenantId = id,
