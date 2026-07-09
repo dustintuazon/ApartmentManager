@@ -3,9 +3,36 @@
 @{
 	ViewData["Title"] = "Rooms"; 
 }
-<h1>Rooms</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<div class="">
+		<h1>Rooms</h1>
+		<a class="btn btn-primary" asp-action="CreateEditRoom" asp-controller="Room">Create Room</a>
+	</div>
 
-<a class="btn btn-primary my-3" asp-action="CreateEditRoom" asp-controller="Room">Create Room</a>
+	<div class="d-md-flex justify-content-between gap-sm-3 mb-3">
+		<form method="get" asp-action="Index">
+			@if (ViewData["SearchString"] != null)
+			{
+				<input type="hidden" name="searchString" value="@ViewData["SearchString"]" />
+			}
+			<div class="d-flex gap-2 align-items-center mb-1 mb-md-0">
+				<label for="sortOrder" class="text-nowrap">Sort By: </label>
+				@Html.DropDownList("sortOrder", (SelectList)ViewBag.SortList, new { @class = "form-control", onchange = "this.form.submit();" })
+			</div>
+		</form>
+		<form asp-action="Index" method="get">
+			@if (ViewData["SortOrder"] != null)
+			{
+				<input type="hidden" name="sortOrder" value="@ViewData["SortOrder"]" />
+			}
+			<div class="input-group">
+				<input type="text" class="form-control" name="searchString" value="@ViewData["SearchString"]" autocomplete="off"/>
+				<button class="btn btn-primary" type="submit">Search</button>
+			</div>
+		</form>	
+	</div>
+</div>
+
 
 <div class="container-md">
 	<div class="row">
