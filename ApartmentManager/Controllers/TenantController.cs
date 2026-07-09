@@ -34,8 +34,8 @@ namespace ApartmentManager.Controllers
 
             var sortOptions = new List<SelectListItem>
             {
-                new SelectListItem { Text = "Name (A-Z)", Value = "name_asc" },
-                new SelectListItem { Text = "Name (Z-A)", Value = "name_desc" },
+                new SelectListItem { Text = "Name (Asc)", Value = "name_asc" },
+                new SelectListItem { Text = "Name (Desc)", Value = "name_desc" },
                 new SelectListItem { Text = "Status (Paid)", Value = "status_asc" },
                 new SelectListItem { Text = "Status (Unpaid)", Value = "status_desc" }
             };
