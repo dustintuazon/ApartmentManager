@@ -1,5 +1,6 @@
-﻿@using ApartmentManager.ViewModels.Transaction
-@model IEnumerable<TransactionsViewModel>
+﻿@using ApartmentManager.ViewModels
+@using ApartmentManager.ViewModels.Transaction
+@model PaginatedList<TransactionsViewModel>
 @{
 	ViewData["Title"] = "Transactions";
 }
@@ -8,9 +9,9 @@
 	<div class="d-sm-flex mx-3">
 		<div class="mb-1 mb-md-0">
 			<form asp-action="Index" method="get">
-				@if (ViewData["SearchName"] != null)
+				@if (ViewData["CurrentSearch"] != null)
 				{
-					<input hidden name="searchName" value="@ViewData["SearchName"]" />
+					<input hidden name="currentSearch" value="@ViewData["CurrentSearch"]" />
 				}
 				<input class="form-control" type="date" name="filterDate" value="@ViewData["FilterDate"]" onchange="this.form.submit();"/>
 			</form>
@@ -21,7 +22,7 @@
 				<input hidden name="filterDate" value="@ViewData["FilterDate"]" />
 			}
 			<div class="input-group mx-3">
-				<input class="form-control" type="text" name="searchName" value="@ViewData["SearchName"]" autocomplete="off" />
+				<input class="form-control" type="text" name="searchString" value="@ViewData["CurrentSearch"]" autocomplete="off" />
 				<button class="btn btn-primary" type="submit">Search</button>
 			</div>
 		</form>
@@ -50,3 +51,23 @@
 		}
 	</tbody>
 </table>
+
+@{
+	var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+	var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["FilterDate"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentSearch="@ViewData["CurrentSearch"]" 
+   class="btn btn-primary @prevDisabled">
+	Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["FilterDate"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentSearch="@ViewData["CurrentSearch"]"
+   class="btn btn-primary @nextDisabled">
+	Next
+</a>

@@ -2,6 +2,7 @@
 using ApartmentManager.DTOs;
 using ApartmentManager.Interfaces;
 using ApartmentManager.Models;
+using ApartmentManager.ViewModels;
 using ApartmentManager.ViewModels.Transaction;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,20 +23,31 @@ namespace ApartmentManager.Controllers
             _paymentService = paymentService;
         }
 
-        public async Task<IActionResult> Index(DateOnly? filterDate, string searchName)
+        public async Task<IActionResult> Index(DateOnly? filterDate, string currentSearch, string searchString, int? pageNumber)
         {
             ViewData["FilterDate"] = filterDate?.ToString("yyyy-MM-dd");
-            ViewData["SearchName"] = searchName;
-            var transactions = await _context.Transactions.Include(t => t.Tenant).Where(t => t.UserId == _userManager.GetUserId(User)).OrderByDescending(t => t.Date).ToListAsync();
 
-            if(!string.IsNullOrEmpty(searchName))
+            if(searchString != null)
             {
-                transactions = transactions.Where(t => t.Tenant.Name.Contains(searchName, StringComparison.OrdinalIgnoreCase)).ToList();
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentSearch;
+            }
+
+            ViewData["CurrentSearch"] = searchString;
+
+            var transactions = _context.Transactions.Where(t => t.UserId == _userManager.GetUserId(User)).OrderByDescending(t => t.Date).AsNoTracking();
+
+            if(!string.IsNullOrEmpty(searchString))
+            {
+                transactions = transactions.Where(t => t.Tenant.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase));
             }
 
             if (filterDate != null)
             {
-                transactions = transactions.Where(t => t.Date == filterDate).ToList();
+                transactions = transactions.Where(t => t.Date == filterDate);
             }
 
             var viewModel = transactions.Select(t => new TransactionsViewModel
@@ -47,7 +59,9 @@ namespace ApartmentManager.Controllers
                 Purpose = t.Purpose
             });
 
-            return View(viewModel);
+            int pageSize = 10;
+            
+            return View(await PaginatedList<TransactionsViewModel>.CreateAsync(viewModel, pageNumber ?? 1, pageSize));
         }
 
         [HttpGet]
