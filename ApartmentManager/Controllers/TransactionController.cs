@@ -42,7 +42,7 @@ namespace ApartmentManager.Controllers
 
             if(!string.IsNullOrEmpty(searchString))
             {
-                transactions = transactions.Where(t => t.Tenant.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase));
+                transactions = transactions.Where(t => t.Tenant.Name.Contains(searchString));
             }
 
             if (filterDate != null)
