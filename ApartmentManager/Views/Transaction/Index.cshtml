@@ -57,17 +57,21 @@
 	var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["FilterDate"]"
-   asp-route-pageNumber="@(Model.PageIndex - 1)"
-   asp-route-currentSearch="@ViewData["CurrentSearch"]" 
-   class="btn btn-primary @prevDisabled">
-	Previous
-</a>
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["FilterDate"]"
-   asp-route-pageNumber="@(Model.PageIndex + 1)"
-   asp-route-currentSearch="@ViewData["CurrentSearch"]"
-   class="btn btn-primary @nextDisabled">
-	Next
-</a>
+<div class="d-inline-flex gap-2">
+	<a asp-action="Index"
+	   asp-route-sortOrder="@ViewData["FilterDate"]"
+	   asp-route-pageNumber="@(Model.PageIndex - 1)"
+	   asp-route-currentSearch="@ViewData["CurrentSearch"]" 
+	   class="btn btn-sm btn-outline-primary @prevDisabled">
+		Previous
+	</a>
+	<div class="input-group">
+	</div>
+	<a asp-action="Index"
+	   asp-route-sortOrder="@ViewData["FilterDate"]"
+	   asp-route-pageNumber="@(Model.PageIndex + 1)"
+	   asp-route-currentSearch="@ViewData["CurrentSearch"]"
+	   class="btn btn-sm btn-outline-primary @nextDisabled">
+		Next
+	</a>
+</div>
