@@ -1,5 +1,6 @@
-﻿@using ApartmentManager.ViewModels.Account
-@model IEnumerable<ViewUserViewModel>
+﻿@using ApartmentManager.ViewModels
+@using ApartmentManager.ViewModels.Account
+@model PaginatedList<ViewUserViewModel>
 
 @{
 	ViewData["Title"] = "Users";
@@ -8,7 +9,7 @@
 	<h1>Accounts</h1>
 	<form method="get" asp-action="Index">
 		<div class="input-group">
-			<input class="form-control" type="text" name="searchString" value="@ViewData["SearchString"]" autocomplete="off"/>
+			<input class="form-control" type="text" name="searchString" value="@ViewData["CurrentSearch"]" autocomplete="off"/>
 			<button type="submit" class="btn btn-primary">Search</button>
 		</div>
 	</form>
@@ -41,4 +42,26 @@
 			}
 		</tbody>
 	</table>
+</div>
+
+@{
+	var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+	var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<div class="d-inline-flex gap-2">
+	<a asp-action="Index"
+	   asp-route-pageNumber="@(Model.PageIndex - 1)"
+	   asp-route-currentSearch="@ViewData["CurrentSearch"]"
+	   class="btn btn-sm btn-outline-primary @prevDisabled">
+		Previous
+	</a>
+	<div class="input-group">
+	</div>
+	<a asp-action="Index"
+	   asp-route-pageNumber="@(Model.PageIndex + 1)"
+	   asp-route-currentSearch="@ViewData["CurrentSearch"]"
+	   class="btn btn-sm btn-outline-primary @nextDisabled">
+		Next
+	</a>
 </div>
