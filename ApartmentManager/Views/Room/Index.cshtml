@@ -1,5 +1,6 @@
-﻿@using ApartmentManager.ViewModels.Room
-@model IEnumerable<ViewRoomViewModel>
+﻿@using ApartmentManager.ViewModels
+@using ApartmentManager.ViewModels.Room
+@model PaginatedList<ViewRoomViewModel>
 @{
 	ViewData["Title"] = "Rooms"; 
 }
@@ -11,9 +12,9 @@
 
 	<div class="d-md-flex justify-content-between gap-sm-3 mb-3">
 		<form method="get" asp-action="Index">
-			@if (ViewData["SearchString"] != null)
+			@if (ViewData["CurrentSearch"] != null)
 			{
-				<input type="hidden" name="searchString" value="@ViewData["SearchString"]" />
+				<input type="hidden" name="searchString" value="@ViewData["CurrentSearch"]" />
 			}
 			<div class="d-flex gap-2 align-items-center mb-1 mb-md-0">
 				<label for="sortOrder" class="text-nowrap">Sort By: </label>
@@ -26,7 +27,7 @@
 				<input type="hidden" name="sortOrder" value="@ViewData["SortOrder"]" />
 			}
 			<div class="input-group">
-				<input type="text" class="form-control" name="searchString" value="@ViewData["SearchString"]" autocomplete="off"/>
+				<input type="text" class="form-control" name="searchString" value="@ViewData["CurrentSearch"]" autocomplete="off"/>
 				<button class="btn btn-primary" type="submit">Search</button>
 			</div>
 		</form>	
@@ -67,4 +68,28 @@
 			</div>
 		}
 	</div>
+</div>
+
+@{
+	var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+	var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<div class="d-inline-flex gap-2">
+	<a asp-action="Index"
+	   asp-route-sortOrder="@ViewData["SortOrder"]"
+	   asp-route-pageNumber="@(Model.PageIndex - 1)"
+	   asp-route-currentSearch="@ViewData["CurrentSearch"]"
+	   class="btn btn-sm btn-outline-primary @prevDisabled">
+		Previous
+	</a>
+	<div class="input-group">
+	</div>
+	<a asp-action="Index"
+	   asp-route-sortOrder="@ViewData["SortOrder"]"
+	   asp-route-pageNumber="@(Model.PageIndex + 1)"
+	   asp-route-currentSearch="@ViewData["CurrentSearch"]"
+	   class="btn btn-sm btn-outline-primary @nextDisabled">
+		Next
+	</a>
 </div>
