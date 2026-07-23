@@ -78,6 +78,7 @@ namespace ApartmentManager.Controllers
                 TenantId = t.Id,
                 RoomName = t.Room.Name,
                 TenantName = t.Name,
+                Monthly = t.Room.Monthly,
                 Deposit = t.Deposit,
                 Balance = t.Balance,
                 DueDate = t.MoveInDate.AddMonths(t.MonthsPaid),
@@ -171,6 +172,7 @@ namespace ApartmentManager.Controllers
                 RoomName = tenant.Room.Name,
                 MoveInDate = tenant.MoveInDate,
                 MoveOutDate = tenant.MoveOutDate,
+                Monthly = tenant.Room.Monthly,
                 Balance = tenant.Balance,
                 Deposit = tenant.Deposit,
                 Transactions = tenant.Transactions.Select(t => new TransactionsViewModel
@@ -180,7 +182,7 @@ namespace ApartmentManager.Controllers
                     MOP = t.ModeOfPayment,
                     Purpose = t.Purpose,
                     ReferenceNumber = t.ReferenceNumber?.ToString() ?? ""
-                }).ToList()
+                }).OrderByDescending(t=> t.Date).ToList()
             };
             var moveOutDateViewModel = new MoveOutDateViewModel
             {

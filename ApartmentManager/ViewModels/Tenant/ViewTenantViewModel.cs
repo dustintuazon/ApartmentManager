@@ -10,6 +10,7 @@ namespace ApartmentManager.ViewModels.Tenant
         public string RoomName { get; set; } = string.Empty;
         public DateOnly MoveInDate { get; set; }
         public DateOnly? MoveOutDate { get; set; }
+        public int Monthly { get; set; }
         public int Balance { get; set; }
         public int Deposit { get; set; }
         public List<TransactionsViewModel> Transactions { get; set; } = new List<TransactionsViewModel>();

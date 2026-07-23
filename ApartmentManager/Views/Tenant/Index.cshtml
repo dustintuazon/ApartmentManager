@@ -61,6 +61,7 @@
 								<p class="card-text my-1 border d-inline-block px-2 py-1 @(tenant.Paid ? "border-success text-success" : "border-danger text-danger") rounded">@(tenant.Paid ? "Paid" : "Unpaid")</p>
 							</div>
 						</div>
+						<p class="card-text my-1">Monthly: @tenant.Monthly.ToString("C")</p>
 						<p class="card-text my-1">Deposit: @tenant.Deposit.ToString("C")</p>
 						<p class="card-text my-1">Balance: @tenant.Balance.ToString("C")</p>
 						<p class="card-text my-1">@(tenant.UseAdvance ? "Move Out Date: " + tenant.MoveOutDate?.ToString("d") : "Due Date: " + tenant.DueDate.ToString("d"))</p>
