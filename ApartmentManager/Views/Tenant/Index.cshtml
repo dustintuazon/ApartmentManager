@@ -1,5 +1,6 @@
-﻿@using ApartmentManager.ViewModels.Tenant
-@model IEnumerable<TenantsViewModel>
+﻿@using ApartmentManager.ViewModels
+@using ApartmentManager.ViewModels.Tenant
+@model PaginatedList<TenantsViewModel>
 @{
 	ViewData["Title"] = "Tenants";
 }
@@ -10,9 +11,9 @@
 	<div class="d-md-flex justify-content-between gap-sm-3 mb-3">
 		<form method="get" asp-action="Index">
 			<div class="d-flex align-items-center gap-2 mb-1 mb-md-0">
-				@if (!string.IsNullOrEmpty(ViewData["SearchString"] as string))
+				@if (!string.IsNullOrEmpty(ViewData["CurrentSearch"] as string))
 				{
-					<input hidden name="searchString" value="@ViewData["SearchString"]" />
+					<input hidden name="searchString" value="@ViewData["CurrentSearch"]" />
 				}
 				<label for="sortOrder" class="text-nowrap">Sort By:</label>
 				@Html.DropDownList("sortOrder", (SelectList)ViewBag.SortList, new { @class = "form-control", onchange = "this.form.submit();" })
@@ -25,7 +26,7 @@
 					<input hidden name="sortOrder" value="@ViewData["SortOrder"]" />
 				}
 				<div class="input-group">
-					<input type="text" name="searchString" value="@ViewData["SearchString"]" class="form-control" />
+					<input type="text" name="searchString" value="@ViewData["CurrentSearch"]" class="form-control" autocomplete="off"/>
 					<button type="submit" class="btn btn-primary">Search</button>
 				</div>
 			</div>
@@ -63,10 +64,37 @@
 						<p class="card-text my-1">Deposit: @tenant.Deposit.ToString("C")</p>
 						<p class="card-text my-1">Balance: @tenant.Balance.ToString("C")</p>
 						<p class="card-text my-1">@(tenant.UseAdvance ? "Move Out Date: " + tenant.MoveOutDate?.ToString("d") : "Due Date: " + tenant.DueDate.ToString("d"))</p>
-						<p class="card-text my-1">@(tenant.DaysDue >= 0 ? "Due in" : "Overdue for") @Math.Abs(tenant.DaysDue) Days</p>
+						@if (!tenant.UseAdvance) 
+						{
+							<p class="card-text my-1">@(tenant.DaysDue >= 0 ? "Due in" : "Overdue for") @Math.Abs(tenant.DaysDue) Days</p>				
+						}
 					</div>
 				</div>
 			</div>
 		}
 	</div>
+</div>
+
+@{
+	var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+	var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<div class="d-inline-flex gap-2">
+	<a asp-action="Index"
+	   asp-route-sortOrder="@ViewData["CurrentSort"]"
+	   asp-route-pageNumber="@(Model.PageIndex - 1)"
+	   asp-route-currentSearch="@ViewData["CurrentSearch"]"
+	   class="btn btn-sm btn-outline-primary @prevDisabled">
+		Previous
+	</a>
+	<div class="input-group">
+	</div>
+	<a asp-action="Index"
+	   asp-route-sortOrder="@ViewData["CurrentSort"]"
+	   asp-route-pageNumber="@(Model.PageIndex + 1)"
+	   asp-route-currentSearch="@ViewData["CurrentSearch"]"
+	   class="btn btn-sm btn-outline-primary @nextDisabled">
+		Next
+	</a>
 </div>
