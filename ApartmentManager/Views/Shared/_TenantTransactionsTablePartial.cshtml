@@ -1,0 +1,42 @@
+﻿@using ApartmentManager.ViewModels
+@using ApartmentManager.ViewModels.Transaction
+@model PaginatedList<TransactionsViewModel>
+
+<div class="container mt-3">
+	<h3>Transactions</h3>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Purpose</th>
+				<th>Amount</th>
+				<th>Date</th>
+				<th>Payment Method</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var transaction in Model)
+			{
+				<tr>
+					<td>@transaction.Purpose</td>
+					<td>@transaction.Amount.ToString("C")</td>
+					<td>@transaction.Date.ToShortDateString()</td>
+					<td>@transaction.MOP</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+<nav>
+	<ul class="pagination">
+		<li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+			<button class="page-link pager-btn" data-page="@(Model.PageIndex - 1)">Previous</button>
+		</li>
+
+		<li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+			<button class="page-link pager-btn" data-page="@(Model.PageIndex + 1)">Next</button>
+		</li>
+	</ul>
+</nav>
+
+@{
+}

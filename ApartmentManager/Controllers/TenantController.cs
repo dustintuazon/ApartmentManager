@@ -174,15 +174,7 @@ namespace ApartmentManager.Controllers
                 MoveOutDate = tenant.MoveOutDate,
                 Monthly = tenant.Room.Monthly,
                 Balance = tenant.Balance,
-                Deposit = tenant.Deposit,
-                Transactions = tenant.Transactions.Select(t => new TransactionsViewModel
-                {
-                    Amount = t.Amount,
-                    Date = t.Date,
-                    MOP = t.ModeOfPayment,
-                    Purpose = t.Purpose,
-                    ReferenceNumber = t.ReferenceNumber?.ToString() ?? ""
-                }).OrderByDescending(t=> t.Date).ToList()
+                Deposit = tenant.Deposit
             };
             var moveOutDateViewModel = new MoveOutDateViewModel
             {
@@ -195,6 +187,25 @@ namespace ApartmentManager.Controllers
                 MoveOutDateViewModel = moveOutDateViewModel
             };
             return View(viewModelWrapper);
+        }
+
+        [HttpGet]
+        public async Task<PartialViewResult> GetTransactionsPartial(int id, int? pageIndex)
+        {
+            var transactions = _context.Transactions.Where(t => t.TenantId == id && t.UserId == _userManager.GetUserId(User)).AsNoTracking();
+
+            var transactionsViewModel = transactions.Select(t => new TransactionsViewModel
+            {
+                Amount = t.Amount,
+                Date = t.Date,
+                MOP = t.ModeOfPayment,
+                Purpose = t.Purpose,
+                ReferenceNumber = t.ReferenceNumber.ToString() ?? ""
+            }).OrderByDescending(t => t.Date);
+
+            var pageSize = 10;
+
+            return PartialView("_TenantTransactionsTablePartial", await PaginatedList<TransactionsViewModel>.CreateAsync(transactionsViewModel, pageIndex ?? 1, pageSize));
         }
 
         [HttpPost]

@@ -13,6 +13,5 @@ namespace ApartmentManager.ViewModels.Tenant
         public int Monthly { get; set; }
         public int Balance { get; set; }
         public int Deposit { get; set; }
-        public List<TransactionsViewModel> Transactions { get; set; } = new List<TransactionsViewModel>();
     }
 }

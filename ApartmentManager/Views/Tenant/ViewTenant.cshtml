@@ -45,29 +45,39 @@
 		</div>
 	</div>
 }
-<div class="container mt-3">
-	<h3>Transactions</h3>
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Purpose</th>
-				<th>Amount</th>
-				<th>Date</th>
-				<th>Payment Method</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var transaction in Model.ViewTenantViewModel.Transactions)
-			{
-				<tr>
-					<td>@transaction.Purpose</td>
-					<td>@transaction.Amount.ToString("C")</td>
-					<td>@transaction.Date.ToShortDateString()</td>
-					<td>@transaction.MOP</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+
+<div class="my-3" id="partialViewContainer">
 </div>
 
 <a class="btn btn-primary" asp-action="Index" asp-controller="Tenant">Back to List</a>
+
+@section Scripts{
+	<script src="https://jquery.com"></script>
+	<script>
+		$(document).ready(function () {
+			loadPage();
+
+			$("#partialViewContainer").on("click", ".pager-btn", function (e) {
+				e.preventDefault();
+				var targetPage = $(this).data("page");
+				if (targetPage) {
+					loadPage(targetPage);
+				}
+			});
+		});
+
+		function loadPage(pageNumber) {
+			$.ajax({
+				url: '@Url.Action("GetTransactionsPartial", "Tenant")',
+				type: 'GET',
+				data: { id: @Model.ViewTenantViewModel.TenantId, pageIndex: pageNumber },
+				success: function (result) {
+					$("#partialViewContainer").html(result);
+				},
+				error: function () {
+					alert("Error loading data.");
+				}
+			});
+		}
+	</script>
+}
