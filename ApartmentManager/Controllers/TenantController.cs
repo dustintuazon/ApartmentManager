@@ -27,10 +27,19 @@ namespace ApartmentManager.Controllers
             _paymentService = paymentService;
         }
 
-        public async Task<IActionResult> Index(string sortOrder, string searchString)
+        public async Task<IActionResult> Index(string sortOrder, string searchString, string currentSearch, int? pageNumber)
         {
+            if(searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentSearch;
+            }
+
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["SearchString"] = searchString;
+            ViewData["CurrentSearch"] = searchString;
 
             var sortOptions = new List<SelectListItem>
             {
@@ -41,59 +50,48 @@ namespace ApartmentManager.Controllers
             };
             ViewBag.SortList = new SelectList(sortOptions, "Value", "Text", sortOrder);
 
-            var tenants = await _context.Tenants.Include(r=>r.Room).Where(t => t.UserId == _userManager.GetUserId(User) && (t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now))).ToListAsync();
+            var tenants = _context.Tenants.Include(r=>r.Room).Where(t => t.UserId == _userManager.GetUserId(User) && (t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now))).AsNoTracking();
             
             if(!string.IsNullOrEmpty(searchString))
             {
-                tenants = tenants.Where(t => t.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+                tenants = tenants.Where(t => t.Name.Contains(searchString));
             }
 
             switch (sortOrder)
             {
                 case "name_desc":
-                    tenants = tenants.OrderByDescending(t => t.Name).ToList();
+                    tenants = tenants.OrderByDescending(t => t.Name);
                     break;
                 case "status_desc":
-                    tenants = tenants.OrderBy(t => t.MoveInDate.AddMonths(t.MonthsPaid).DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber).ToList();
+                    tenants = tenants.OrderBy(t => t.MoveInDate.AddMonths(t.MonthsPaid).DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber);
                     break;
                 case "status_asc":
-                    tenants = tenants.OrderByDescending(t => t.MoveInDate.AddMonths(t.MonthsPaid).DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber).ToList();
+                    tenants = tenants.OrderByDescending(t => t.MoveInDate.AddMonths(t.MonthsPaid).DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber);
                     break;
                 default:
-                    tenants = tenants.OrderBy(t => t.Name).ToList();
+                    tenants = tenants.OrderBy(t => t.Name);
                     break;
             }
 
-            var viewModel = new List<TenantsViewModel>();
-            foreach(var tenant in tenants)
+            var tenantsViewModel = tenants.Select(t => new TenantsViewModel
             {
-                var dueDate = tenant.MoveInDate.AddMonths(tenant.MonthsPaid);
-                var useAdvance = false;
-                if (tenant.MoveOutDate != null)
-                {
-                    var monthBeforeMoveOut = tenant.MoveOutDate.Value.AddMonths(-1);
-                    if (monthBeforeMoveOut < dueDate)
-                    {
-                        useAdvance = true;
-                    }
-                }
-                var tenantViewModel = new TenantsViewModel
-                {
-                    TenantId = tenant.Id,
-                    RoomName = tenant.Room?.Name ?? string.Empty,
-                    TenantName = tenant.Name,
-                    Deposit = tenant.Deposit,
-                    Balance = tenant.Balance,
-                    DueDate = dueDate,
-                    DaysDue = dueDate.DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber,
-                    Paid = dueDate >= DateOnly.FromDateTime(DateTime.Now),
-                    MovingOut = tenant.MoveOutDate != null,
-                    UseAdvance = useAdvance,
-                    MoveOutDate = tenant.MoveOutDate
-                };
-                viewModel.Add(tenantViewModel);
-            }
-            return View(viewModel);
+                TenantId = t.Id,
+                RoomName = t.Room.Name,
+                TenantName = t.Name,
+                Monthly = t.Room.Monthly,
+                Deposit = t.Deposit,
+                Balance = t.Balance,
+                DueDate = t.MoveInDate.AddMonths(t.MonthsPaid),
+                DaysDue = t.MoveInDate.AddMonths(t.MonthsPaid).DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber,
+                Paid = t.MoveInDate.AddMonths(t.MonthsPaid) >= DateOnly.FromDateTime(DateTime.Now),
+                MovingOut = t.MoveOutDate != null,
+                UseAdvance = t.MoveOutDate.Value.AddMonths(-1) < t.MoveInDate.AddMonths(t.MonthsPaid) && t.Balance <= 0,
+                MoveOutDate = t.MoveOutDate
+            });
+
+            int pageSize = 8;
+
+            return View(await PaginatedList<TenantsViewModel>.CreateAsync(tenantsViewModel, pageNumber ?? 1, pageSize));
         }
 
         [HttpGet]
@@ -174,16 +172,9 @@ namespace ApartmentManager.Controllers
                 RoomName = tenant.Room.Name,
                 MoveInDate = tenant.MoveInDate,
                 MoveOutDate = tenant.MoveOutDate,
+                Monthly = tenant.Room.Monthly,
                 Balance = tenant.Balance,
-                Deposit = tenant.Deposit,
-                Transactions = tenant.Transactions.Select(t => new TransactionsViewModel
-                {
-                    Amount = t.Amount,
-                    Date = t.Date,
-                    MOP = t.ModeOfPayment,
-                    Purpose = t.Purpose,
-                    ReferenceNumber = t.ReferenceNumber?.ToString() ?? ""
-                }).ToList()
+                Deposit = tenant.Deposit
             };
             var moveOutDateViewModel = new MoveOutDateViewModel
             {
@@ -196,6 +187,25 @@ namespace ApartmentManager.Controllers
                 MoveOutDateViewModel = moveOutDateViewModel
             };
             return View(viewModelWrapper);
+        }
+
+        [HttpGet]
+        public async Task<PartialViewResult> GetTransactionsPartial(int id, int? pageIndex)
+        {
+            var transactions = _context.Transactions.Where(t => t.TenantId == id && t.UserId == _userManager.GetUserId(User)).AsNoTracking();
+
+            var transactionsViewModel = transactions.Select(t => new TransactionsViewModel
+            {
+                Amount = t.Amount,
+                Date = t.Date,
+                MOP = t.ModeOfPayment,
+                Purpose = t.Purpose,
+                ReferenceNumber = t.ReferenceNumber.ToString() ?? ""
+            }).OrderByDescending(t => t.Date);
+
+            var pageSize = 10;
+
+            return PartialView("_TenantTransactionsTablePartial", await PaginatedList<TransactionsViewModel>.CreateAsync(transactionsViewModel, pageIndex ?? 1, pageSize));
         }
 
         [HttpPost]

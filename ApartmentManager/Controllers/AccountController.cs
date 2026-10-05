@@ -1,9 +1,12 @@
-﻿using ApartmentManager.Models;
+﻿using ApartmentManager.Data;
+using ApartmentManager.Models;
+using ApartmentManager.ViewModels;
 using ApartmentManager.ViewModels.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApartmentManager.Controllers
@@ -13,45 +16,55 @@ namespace ApartmentManager.Controllers
         private readonly SignInManager<User> signInManager;
         private readonly UserManager<User> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
+        private readonly AppDbContext context;
 
-        public AccountController(SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public AccountController(SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, AppDbContext appDbContext)
         {
             this.signInManager = signInManager;
             this.userManager = userManager;
             this.roleManager = roleManager;
+            context = appDbContext;
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(string searchString, string currentSearch, int? pageNumber)
         {
-            ViewData["SearchString"] = searchString;
 
-            var accounts = await userManager.Users.Include(r=>r.Rooms).OrderBy(u => u.UserName).ToListAsync();
+            if(searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentSearch;
+            }
+
+            ViewData["CurrentSearch"] = searchString;
+
+            var accounts = context.Users.Include(r=>r.Rooms).OrderBy(u => u.UserName).AsNoTracking();
             
             if(!string.IsNullOrEmpty(searchString))
             {
-                accounts = accounts.Where(a => a.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase) || a.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+                accounts = accounts.Where(a => a.UserName.Contains(searchString) || a.Email.Contains(searchString));
             }
 
-            List<ViewUserViewModel> accountsViewModel = new List<ViewUserViewModel>();
-
-            foreach(var account in accounts)
+            var viewModel = accounts.Select(a => new ViewUserViewModel
             {
-                var roles = await userManager.GetRolesAsync(account);
-                var roomCount = account.Rooms?.Count ?? 0;
+                Id = a.Id,
+                Username = a.UserName,
+                Email = a.Email,
+                Roles = string.Join(",", context.UserRoles.Where(u => u.UserId == a.Id)
+                    .Join(context.Roles,
+                        userRole => userRole.RoleId,
+                        role => role.Id,
+                        (userRole, role) => role.Name)
+                    .ToList()),
+                NumberOfRooms = a.Rooms.Count
+            });
 
-                var accountViewModel = new ViewUserViewModel
-                {
-                    Id = account.Id,
-                    Username = account.UserName,
-                    Email = account.Email,
-                    Roles = string.Join(",", roles.ToArray()),
-                    NumberOfRooms = roomCount
-                };
-                accountsViewModel.Add(accountViewModel);
-            }
+            int pageSize = 10;
 
-            return View(accountsViewModel);
+            return View(await PaginatedList<ViewUserViewModel>.CreateAsync(viewModel, pageNumber ?? 1, pageSize));
         }
 
         [HttpGet]

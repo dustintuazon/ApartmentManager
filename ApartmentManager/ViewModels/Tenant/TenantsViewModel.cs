@@ -5,6 +5,7 @@
         public int TenantId { get; set; }
         public string RoomName { get; set; } = string.Empty;
         public string TenantName { get; set; } = string.Empty;
+        public int Monthly { get; set; }
         public int Deposit { get; set; }
         public int Balance { get; set; }
         public DateOnly DueDate { get; set; }

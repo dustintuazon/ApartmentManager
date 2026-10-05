@@ -1,5 +1,6 @@
 ﻿using ApartmentManager.Data;
 using ApartmentManager.Models;
+using ApartmentManager.ViewModels;
 using ApartmentManager.ViewModels.Room;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -22,9 +23,19 @@ namespace ApartmentManager.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index(string searchString, string sortOrder)
+        public async Task<IActionResult> Index(string searchString, string currentSearch, string sortOrder, int? pageNumber)
         {
-            ViewData["SearchString"] = searchString;
+
+            if(searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentSearch;
+            }
+
+            ViewData["CurrentSearch"] = searchString;
             ViewData["SortOrder"] = sortOrder;
 
             var sortList = new List<SelectListItem>
@@ -38,26 +49,26 @@ namespace ApartmentManager.Controllers
             ViewBag.SortList = new SelectList(sortList, "Value", "Text", sortOrder);
 
 
-            var rooms = await _context.Rooms.Include(r=>r.Tenants).Where(r => r.UserId == _userManager.GetUserId(User) && !r.IsArchived).OrderBy(r => r.Name).ToListAsync();
+            var rooms = _context.Rooms.Include(r=>r.Tenants).Where(r => r.UserId == _userManager.GetUserId(User) && !r.IsArchived).OrderBy(r => r.Name).AsNoTracking();
             
             if (!string.IsNullOrEmpty(searchString))
             {
-                rooms = rooms.Where(r => r.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+                rooms = rooms.Where(r => r.Name.Contains(searchString));
             }
 
             switch (sortOrder)
             {
                 case "name-desc":
-                    rooms = rooms.OrderByDescending(r => r.Name).ToList();
+                    rooms = rooms.OrderByDescending(r => r.Name);
                     break;
                 case "available-asc":
-                    rooms = rooms.OrderBy(r => r.Tenants?.Any(t => t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now)) ?? false).ToList();
+                    rooms = rooms.OrderBy(r => r.Tenants.Any(t => t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now)));
                     break;
                 case "available-desc":
-                    rooms = rooms.OrderByDescending(r => r.Tenants?.Any(t => t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now)) ?? false).ToList();
+                    rooms = rooms.OrderByDescending(r => r.Tenants.Any(t => t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now)));
                     break;
                 default:
-                    rooms = rooms.OrderBy(r => r.Name).ToList();
+                    rooms = rooms.OrderBy(r => r.Name);
                     break;
             }
 
@@ -69,9 +80,12 @@ namespace ApartmentManager.Controllers
                 Monthly = r.Monthly,
                 MonthsDeposit = r.Deposit,
                 MonthsAdvance = r.Advance,
-                OccupiedBy = r.Tenants?.Where(t => t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now)).FirstOrDefault()?.Name
-            }).ToList();
-            return View(roomViewModels);
+                OccupiedBy = r.Tenants.Where(t => t.MoveOutDate == null || t.MoveOutDate > DateOnly.FromDateTime(DateTime.Now)).Select(t => t.Name).FirstOrDefault(),
+            });
+
+            int pageSize = 8;
+
+            return View(await PaginatedList<ViewRoomViewModel>.CreateAsync(roomViewModels, pageNumber ?? 1, pageSize));
         }
 
         [HttpGet]
