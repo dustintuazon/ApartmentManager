@@ -72,7 +72,7 @@ namespace ApartmentManager.Controllers
                     break;
             }
 
-            var roomViewModels = rooms.Select(r => new ViewRoomViewModel
+            var roomViewModels = rooms.Select(r => new RoomsViewModel
             {
                 Id = r.Id,
                 Name = r.Name,
@@ -85,7 +85,7 @@ namespace ApartmentManager.Controllers
 
             int pageSize = 8;
 
-            return View(await PaginatedList<ViewRoomViewModel>.CreateAsync(roomViewModels, pageNumber ?? 1, pageSize));
+            return View(await PaginatedList<RoomsViewModel>.CreateAsync(roomViewModels, pageNumber ?? 1, pageSize));
         }
 
         [HttpGet]
