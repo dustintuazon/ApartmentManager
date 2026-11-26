@@ -8,7 +8,7 @@ namespace ApartmentManager.ViewModels.Transaction
         public int TenantId { get; set; }
         public string TenantName { get; set; } = string.Empty;
         [Required]
-        public int Amount { get; set; }
+        public int? Amount { get; set; }
         [Required]
         [Display(Name = "Date")]
         [DataType(DataType.Date)]

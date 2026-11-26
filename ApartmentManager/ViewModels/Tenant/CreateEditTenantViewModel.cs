@@ -11,9 +11,11 @@ namespace ApartmentManager.ViewModels.Tenant
         [Display(Name = "Description")]
         public string Description { get; set; } = string.Empty;
         [Required]
-        public int DepositPaid { get; set; }
+        [Display(Name = "Deposit")]
+        public int? DepositPaid { get; set; }
         [Required]
-        public int AdvancePaid { get; set; }
+        [Display(Name = "Advance")]
+        public int? AdvancePaid { get; set; }
         [Required]
         [Display(Name = "Move In Date")]
         [DataType(DataType.Date)]

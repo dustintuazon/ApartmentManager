@@ -140,7 +140,7 @@ namespace ApartmentManager.Controllers
                 var handleDepositPayment = new ProcessPaymentDto
                 {
                     TenantId = newTenant.Id,
-                    Amount = tenant.DepositPaid,
+                    Amount = (int)tenant.DepositPaid,
                     Purpose = Purpose.Deposit,
                     MOP = (ModeOfPayment)transaction.ModeOfPayment,
                     DatePaid = transaction.PaymentDate,
@@ -149,7 +149,7 @@ namespace ApartmentManager.Controllers
                 };
                 await _paymentService.ProcessPayment(handleDepositPayment);
                 var handleAdvancePayment = handleDepositPayment;
-                handleAdvancePayment.Amount = tenant.AdvancePaid;
+                handleAdvancePayment.Amount = (int)tenant.AdvancePaid;
                 handleAdvancePayment.Purpose = Purpose.Advance;
                 await _paymentService.ProcessPayment(handleAdvancePayment);
                 

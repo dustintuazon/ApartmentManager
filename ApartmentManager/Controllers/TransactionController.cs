@@ -89,7 +89,7 @@ namespace ApartmentManager.Controllers
             var dto = new ProcessPaymentDto
             {
                 TenantId = id,
-                Amount = viewModel.Amount,
+                Amount = (int)viewModel.Amount,
                 Purpose = (Purpose)viewModel.Purpose,
                 MOP = (ModeOfPayment)viewModel.ModeOfPayment,
                 DatePaid = viewModel.PaymentDate,
